@@ -2,7 +2,9 @@
 
 App de gestión de gimnasio con tres roles (alumno, entrenador y administrador): rutinas con ejercicios de [ExerciseDB](https://github.com/exercisedb/exercisedb-api), pago de mensualidades, acceso por QR con control de morosidad, nómina de entrenadores, dashboard con exportación a Excel y soporte PWA.
 
-El plan completo está en [`docs/PLAN.md`](docs/PLAN.md).
+El plan completo está en [`docs/PLAN.md`](docs/PLAN.md) y las tareas del backend (issues por fase) en [`docs/BACKLOG-BACKEND.md`](docs/BACKLOG-BACKEND.md).
+
+Ramas: `main` (estable) y `develop` (integración). Las tareas se trabajan en `feature/<issue>-descripcion` desde `develop`.
 
 ## Stack
 
