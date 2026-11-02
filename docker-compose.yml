@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gymtonic-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gymtonic
+      POSTGRES_PASSWORD: gymtonic
+      POSTGRES_DB: gymtonic
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gymtonic']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: gymtonic-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: gymtonic-mailhog
+    restart: unless-stopped
+    ports:
+      - '1025:1025' # SMTP
+      - '8025:8025' # UI web
+
+volumes:
+  pgdata:
