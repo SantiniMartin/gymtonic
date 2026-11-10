@@ -4,13 +4,14 @@ App de gestión de gimnasio con tres roles (alumno, entrenador y administrador):
 
 El plan completo está en [`docs/PLAN.md`](docs/PLAN.md) y las tareas del backend (issues por fase) en [`docs/BACKLOG-BACKEND.md`](docs/BACKLOG-BACKEND.md).
 
+Cómo está organizado el backend (patrón DTO + Repository) y cómo crear un módulo nuevo: [`docs/ARQUITECTURA-BACKEND.md`](docs/ARQUITECTURA-BACKEND.md).
+
 Ramas: `main` (estable) y `develop` (integración). Las tareas se trabajan en `feature/<issue>-descripcion` desde `develop`.
 
 ## Stack
 
-- **API**: Express 5 · TypeScript · Prisma 6 · PostgreSQL · zod · pino
+- **API**: Express 5 · TypeScript · Prisma 6 · PostgreSQL · pino · patrón DTO + Repository
 - **Web**: React 19 · Vite · Tailwind CSS 4 · React Router · TanStack Query
-- **Compartido**: `@gymtonic/shared` (enums, reglas de negocio y schemas zod usados en API y Web)
 - **Infra local**: Docker Compose (PostgreSQL, Redis, Mailhog)
 
 ## Estructura
@@ -20,8 +21,6 @@ apps/
   api/       API REST (Express + Prisma)
     prisma/  schema, migraciones y seed
   web/       Frontend (React + Vite)
-packages/
-  shared/    Enums y schemas zod compartidos
 docs/        Plan del proyecto
 ```
 

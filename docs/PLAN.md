@@ -16,17 +16,16 @@ Supuestos (ajustables): pasarela de pago **Mercado Pago** (Checkout Pro + webhoo
 gym-app/
 ├─ apps/api        (Express)
 ├─ apps/web        (React + Vite + PWA)
-├─ packages/shared (schemas zod, tipos, enums compartidos)
 ├─ docker-compose.yml (postgres, redis, mailhog)
 ```
 
-| Capa     | Herramientas                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Backend  | express 5, typescript, tsx, **zod** (validación), **Prisma** (ORM + migraciones), jsonwebtoken + refresh tokens en cookie httpOnly, argon2 (hash), helmet, cors, express-rate-limit, pino (logs), **BullMQ + Redis** (jobs: notificaciones, vencimientos), node-cron (scheduler), **exceljs** (Excel), **pdfkit** o `@react-pdf/renderer` (descargar rutina PDF), qrcode (generar QR), mercadopago SDK, nodemailer, **web-push** (notificaciones PWA), swagger-ui-express + `zod-to-openapi` (docs) |
-| Frontend | react 19, vite, typescript, **react-router**, **@tanstack/react-query**, **react-hook-form + @hookform/resolvers/zod**, **tailwindcss + shadcn/ui**, **recharts** (línea de progreso y dashboard), **@zxing/browser** o `html5-qrcode` (escaneo QR), zustand (estado de sesión), dayjs, **vite-plugin-pwa** (Workbox)                                                                                                                                                                               |
-| Calidad  | eslint, prettier, vitest + supertest (API), vitest + testing-library (web), playwright (e2e), husky + lint-staged                                                                                                                                                                                                                                                                                                                                                                                   |
+| Capa     | Herramientas                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend  | express 5, typescript, tsx, **DTOs con validación propia** (sin librerías), **Prisma** (ORM + migraciones), jsonwebtoken + refresh tokens en cookie httpOnly, argon2 (hash), helmet, cors, express-rate-limit, pino (logs), **BullMQ + Redis** (jobs: notificaciones, vencimientos), node-cron (scheduler), **exceljs** (Excel), **pdfkit** o `@react-pdf/renderer` (descargar rutina PDF), qrcode (generar QR), mercadopago SDK, nodemailer, **web-push** (notificaciones PWA), swagger-ui-express (docs) |
+| Frontend | react 19, vite, typescript, **react-router**, **@tanstack/react-query**, **react-hook-form**, **tailwindcss + shadcn/ui**, **recharts** (línea de progreso y dashboard), **@zxing/browser** o `html5-qrcode` (escaneo QR), zustand (estado de sesión), dayjs, **vite-plugin-pwa** (Workbox)                                                                                                                                                                                                                |
+| Calidad  | eslint, prettier, vitest + supertest (API), vitest + testing-library (web), playwright (e2e), husky + lint-staged                                                                                                                                                                                                                                                                                                                                                                                          |
 
-`packages/shared` exporta los schemas zod usados **tanto** en validación de requests del backend **como** en formularios del front (una sola fuente de verdad).
+El backend sigue el patrón **DTO + Repository**: ver [ARQUITECTURA-BACKEND.md](ARQUITECTURA-BACKEND.md).
 
 ---
 
@@ -60,7 +59,7 @@ gym-app/
 ## 3. Arquitectura del backend (`apps/api/src`)
 
 ```
-config/        env validado con zod
+config/        variables de entorno y reglas de negocio
 db/            prisma client
 middlewares/   auth (JWT), requireRole(...roles), validate({body,query,params}), errorHandler, rateLimit
 modules/
@@ -78,7 +77,7 @@ modules/
 jobs/          generación de cuotas, aviso vencimiento, morosidad, cálculo nómina
 ```
 
-Patrón por módulo: `*.routes.ts → *.controller.ts → *.service.ts → prisma`, schemas zod en `packages/shared`.
+Patrón por módulo: `*.routes.ts → *.controller.ts → *.service.ts → *.repository.ts → Prisma`, con DTOs en `*.dto.ts`.
 
 ### Reglas de negocio clave
 
@@ -150,7 +149,7 @@ Rutas protegidas por rol (`<RequireRole roles={[...]}/>`).
 
 - Access token corto (15 min) + refresh token rotativo en cookie httpOnly/SameSite.
 - RBAC en middleware + verificación de pertenencia (entrenador ↔ alumno) en servicios.
-- Validación zod en todo input; rate limit en login y scan.
+- Validación de todo input con DTOs; rate limit en login y scan.
 - Webhook MP con validación de firma `x-signature`.
 - AuditLog en acciones admin (ABM usuarios, roles, precios, pagos).
 

@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import request from 'supertest';
-import { z } from 'zod';
-import { Router } from 'express';
 import { createApp } from '../src/app.js';
-import { validate } from '../src/middlewares/validate.js';
 
 describe('app', () => {
   const app = createApp();
@@ -27,27 +24,11 @@ describe('app', () => {
       .send('{"malo":');
     expect(res.status).toBe(400);
   });
-});
 
-describe('middleware validate', () => {
-  it('devuelve 400 con los detalles de zod', async () => {
-    const { errorHandler } = await import('../src/middlewares/error-handler.js');
-    const express = (await import('express')).default;
-    const app = express();
-    const router = Router();
-    router.post('/', validate({ body: z.object({ name: z.string().min(2) }) }), (req, res) => {
-      res.json(req.body);
-    });
-    app.use(express.json());
-    app.use('/t', router);
-    app.use(errorHandler);
-
-    const bad = await request(app).post('/t').send({ name: 'a' });
-    expect(bad.status).toBe(400);
-    expect(bad.body.error.code).toBe('VALIDATION_ERROR');
-    expect(bad.body.error.details[0].path).toBe('name');
-
-    const ok = await request(app).post('/t').send({ name: 'Ana' });
-    expect(ok.status).toBe(200);
+  it('responde 400 con los errores del DTO', async () => {
+    const res = await request(app).get('/api/trainers?page=0&pageSize=500');
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+    expect(res.body.error.details).toHaveLength(2);
   });
 });

@@ -10,7 +10,7 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['apps/api/**/*.ts', 'packages/shared/**/*.ts'],
+    files: ['apps/api/**/*.ts'],
     languageOptions: { globals: globals.node },
   },
   {
@@ -25,6 +25,8 @@ export default tseslint.config(
   {
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      // Permitido para recibir req.body en los DTOs (fromBody(body: any)).
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
   prettier,
