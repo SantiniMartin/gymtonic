@@ -1,6 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
 import { Prisma } from '@prisma/client';
-import { ZodError } from 'zod';
 import { HttpError } from '../lib/http-error.js';
 import { logger } from '../lib/logger.js';
 
@@ -8,18 +7,13 @@ export const notFoundHandler: RequestHandler = (req, _res, next) => {
   next(HttpError.notFound(`Ruta no encontrada: ${req.method} ${req.path}`));
 };
 
+/**
+ * Manejador central de errores. Express 5 le pasa automáticamente
+ * los errores lanzados en controllers async, así que no hace falta try/catch.
+ *
+ * Formato de respuesta: { error: { code, message, details? } }
+ */
 export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
-  if (err instanceof ZodError) {
-    res.status(400).json({
-      error: {
-        code: 'VALIDATION_ERROR',
-        message: 'Datos inválidos',
-        details: err.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
-      },
-    });
-    return;
-  }
-
   if (err instanceof HttpError) {
     res.status(err.status).json({
       error: { code: err.code, message: err.message, details: err.details },

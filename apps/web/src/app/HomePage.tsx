@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { Role } from '@gymtonic/shared';
 import { api } from '@/lib/api';
 
 type Health = { status: string; uptime: number; timestamp: string };
 
-const roles: { role: Role; title: string; items: string[] }[] = [
+const roles = [
   {
-    role: Role.MEMBER,
+    role: 'MEMBER',
     title: 'Alumno',
     items: [
       'Rutinas y checks',
@@ -17,12 +16,12 @@ const roles: { role: Role; title: string; items: string[] }[] = [
     ],
   },
   {
-    role: Role.TRAINER,
+    role: 'TRAINER',
     title: 'Entrenador',
     items: ['Asignar rutinas', 'Lista y detalle de alumnos', 'Ingreso / egreso', 'Salario'],
   },
   {
-    role: Role.ADMIN,
+    role: 'ADMIN',
     title: 'Administrador',
     items: [
       'Dashboard de ingresos',
