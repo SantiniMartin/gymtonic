@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { HttpError } from '../src/lib/http-error.js';
+import { HttpError } from '../../../../src/lib/http-error.js';
 import {
   ListTrainersQueryDto,
   TrainerIdParamsDto,
   TrainerResponseDto,
   type TrainerWithProfile,
-} from '../src/modules/trainers/trainers.dto.js';
+} from '../../../../src/modules/trainers/trainers.dto.js';
 
 describe('ListTrainersQueryDto', () => {
   it('usa valores por defecto', () => {

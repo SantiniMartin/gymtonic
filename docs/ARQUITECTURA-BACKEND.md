@@ -58,7 +58,13 @@ apps/api/src/
 ├─ routes.ts                registra los routers de cada módulo
 ├─ app.ts                   configuración de Express
 └─ server.ts                arranque
-test/                       tests (vitest + supertest)
+apps/api/test/
+├─ unit/                    tests unitarios (sin red ni base de datos)
+│  ├─ lib/                  validators, helpers
+│  └─ modules/<modulo>/     *.dto.test.ts, *.service.test.ts
+└─ integration/             tests HTTP con supertest
+   ├─ app.test.ts
+   └─ modules/<modulo>/     *.routes.test.ts
 ```
 
 ## Qué puede hacer cada capa
@@ -258,10 +264,11 @@ schedulesRouter.post('/', scheduleController.create);
 apiRouter.use('/me/schedules', schedulesRouter);
 ```
 
-### 7. Tests (`test/schedules.*.test.ts`)
+### 7. Tests (`test/unit/modules/schedules/*.test.ts` y `test/integration/modules/schedules/*.test.ts`)
 
-- **DTO**: probá datos válidos, datos inválidos y que junte todos los errores. Ver [`test/trainers.dto.test.ts`](../apps/api/test/trainers.dto.test.ts).
-- **Service**: reemplazá el repository con `vi.mock` para probar la lógica sin base de datos. Ver [`test/trainers.service.test.ts`](../apps/api/test/trainers.service.test.ts).
+- **DTO (`test/unit/modules/<modulo>/<modulo>.dto.test.ts`)**: probá datos válidos, datos inválidos y que junte todos los errores. Ver [`test/unit/modules/trainers/trainers.dto.test.ts`](../apps/api/test/unit/modules/trainers/trainers.dto.test.ts).
+- **Service (`test/unit/modules/<modulo>/<modulo>.service.test.ts`)**: reemplazá el repository con `vi.mock` para probar la lógica sin base de datos. Ver [`test/unit/modules/trainers/trainers.service.test.ts`](../apps/api/test/unit/modules/trainers/trainers.service.test.ts).
+- **Integración HTTP (`test/integration/modules/<modulo>/<modulo>.routes.test.ts`)**: probá el flujo completo de los endpoints con `supertest`. Ver [`test/integration/modules/auth/auth.routes.test.ts`](../apps/api/test/integration/modules/auth/auth.routes.test.ts).
 
 ```ts
 vi.mock('../src/modules/schedules/schedules.repository.js', () => ({

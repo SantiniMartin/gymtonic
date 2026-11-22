@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { trainerRepository } from '../src/modules/trainers/trainers.repository.js';
-import { trainerService } from '../src/modules/trainers/trainers.service.js';
-import { ListTrainersQueryDto } from '../src/modules/trainers/trainers.dto.js';
+import { trainerRepository } from '../../../../src/modules/trainers/trainers.repository.js';
+import { trainerService } from '../../../../src/modules/trainers/trainers.service.js';
+import { ListTrainersQueryDto } from '../../../../src/modules/trainers/trainers.dto.js';
 
 // Reemplazamos el repository por funciones simuladas: el servicio se prueba sin base de datos.
-vi.mock('../src/modules/trainers/trainers.repository.js', () => ({
+vi.mock('../../../../src/modules/trainers/trainers.repository.js', () => ({
   trainerRepository: { findActive: vi.fn(), findActiveById: vi.fn() },
 }));
 

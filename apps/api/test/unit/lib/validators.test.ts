@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { isDayOfWeek, isEmail, isOneOf, isTime, isUuid, toInt } from '../src/lib/validators.js';
+import {
+  isDayOfWeek,
+  isEmail,
+  isOneOf,
+  isTime,
+  isUuid,
+  toInt,
+} from '../../../src/lib/validators.js';
 
 describe('validators', () => {
   it('isEmail', () => {
