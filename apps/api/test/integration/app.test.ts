@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import request from 'supertest';
-import { createApp } from '../src/app.js';
+import { createApp } from '../../src/app.js';
 
 describe('app', () => {
   const app = createApp();
@@ -30,5 +30,12 @@ describe('app', () => {
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
     expect(res.body.error.details).toHaveLength(2);
+  });
+
+  it('responde 413 cuando el body supera el límite de 1 MB', async () => {
+    const huge = 'x'.repeat(1024 * 1024 + 512);
+    const res = await request(app).post('/api/health').send({ huge });
+    expect(res.status).toBe(413);
+    expect(res.body.error.code).toBe('PAYLOAD_TOO_LARGE');
   });
 });

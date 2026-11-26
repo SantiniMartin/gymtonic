@@ -26,7 +26,7 @@ Login, tokens, roles y ABM de usuarios.
 
 | Issue                                                    | Tarea                                      | Labels                         | Estado       |
 | -------------------------------------------------------- | ------------------------------------------ | ------------------------------ | ------------ |
-| [#3](https://github.com/SantiniMartin/gymtonic/issues/3) | Autenticación con JWT y refresh tokens     | `backend` `auth`               | ⬜ Pendiente |
+| [#3](https://github.com/SantiniMartin/gymtonic/issues/3) | Autenticación con JWT y refresh tokens     | `backend` `auth`               | ✅ Hecho     |
 | [#4](https://github.com/SantiniMartin/gymtonic/issues/4) | Middlewares de autenticación y RBAC        | `backend` `auth`               | ⬜ Pendiente |
 | [#5](https://github.com/SantiniMartin/gymtonic/issues/5) | Recuperación y cambio de contraseña        | `backend` `auth` `integración` | ⬜ Pendiente |
 | [#6](https://github.com/SantiniMartin/gymtonic/issues/6) | ABM de usuarios y gestión de roles (admin) | `backend` `admin` `auth`       | ⬜ Pendiente |
