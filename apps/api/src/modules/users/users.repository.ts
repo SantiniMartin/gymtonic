@@ -19,6 +19,13 @@ export interface CreateUserData {
   role: Role;
 }
 
+export interface UpdateUserData {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+}
+
 export class UserRepository {
   /** Lista usuarios no eliminados, con filtros opcionales y búsqueda por nombre o email. */
   async findMany(params: FindUsersParams): Promise<{ items: User[]; total: number }> {
@@ -89,6 +96,41 @@ export class UserRepository {
           entity: 'User',
           entityId: user.id,
           diff: { email: user.email, role: user.role },
+        },
+      });
+
+      return user;
+    });
+  }
+
+  /**
+   * Actualiza los datos básicos y registra en la auditoría qué campos cambiaron
+   * (valor anterior y nuevo), todo en una transacción. Si no cambió nada, no escribe.
+   * Devuelve null si el usuario no existe o fue eliminado.
+   */
+  update(id: string, data: UpdateUserData, actorId: string): Promise<User | null> {
+    return prisma.$transaction(async (tx) => {
+      const current = await tx.user.findFirst({ where: { id, deletedAt: null } });
+      if (!current) return null;
+
+      const fields = ['email', 'firstName', 'lastName', 'phone'] as const;
+      const changes: Record<string, { from: string | null; to: string | null }> = {};
+      for (const field of fields) {
+        if (current[field] !== data[field]) {
+          changes[field] = { from: current[field], to: data[field] };
+        }
+      }
+      if (Object.keys(changes).length === 0) return current;
+
+      const user = await tx.user.update({ where: { id }, data });
+
+      await tx.auditLog.create({
+        data: {
+          actorId,
+          action: 'USER_UPDATED',
+          entity: 'User',
+          entityId: id,
+          diff: changes,
         },
       });
 

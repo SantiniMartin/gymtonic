@@ -102,6 +102,38 @@ export class CreateUserDto {
   }
 }
 
+/** PUT /api/admin/users/:id (el rol y el estado tienen sus propios endpoints) */
+export class UpdateUserDto {
+  constructor(
+    public readonly email: string,
+    public readonly firstName: string,
+    public readonly lastName: string,
+    public readonly phone: string | null,
+  ) {}
+
+  static fromBody(body: any): UpdateUserDto {
+    const errors: string[] = [];
+
+    if (!isEmail(body?.email)) errors.push('email: debe ser un email válido');
+    if (!isNonEmptyString(body?.firstName)) errors.push('firstName: es obligatorio');
+    if (!isNonEmptyString(body?.lastName)) errors.push('lastName: es obligatorio');
+
+    const hasPhone = body?.phone !== undefined && body?.phone !== null && body?.phone !== '';
+    if (hasPhone && (!isNonEmptyString(body.phone) || body.phone.trim().length > 30)) {
+      errors.push('phone: debe ser texto de hasta 30 caracteres');
+    }
+
+    if (errors.length > 0) throw HttpError.validation(errors);
+
+    return new UpdateUserDto(
+      body.email.trim().toLowerCase(),
+      body.firstName.trim(),
+      body.lastName.trim(),
+      hasPhone ? body.phone.trim() : null,
+    );
+  }
+}
+
 // ── Salida ──
 
 /** Nunca incluye passwordHash ni deletedAt. */
