@@ -1,8 +1,12 @@
 import { Router } from 'express';
+import { requireAuth } from '../../middlewares/require-auth.js';
+import { requireRole } from '../../middlewares/require-role.js';
 import { userController } from './users.controller.js';
 
 export const usersRouter = Router();
 
-// TODO: proteger con requireAuth + requireRole('ADMIN') cuando el PR #40 esté en develop.
+// Todo lo de /api/admin/users es solo para administradores.
+usersRouter.use(requireAuth, requireRole('ADMIN'));
+
 usersRouter.get('/', userController.list);
 usersRouter.get('/:id', userController.getById);

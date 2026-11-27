@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { userRepository } from '../src/modules/users/users.repository.js';
-import { userService } from '../src/modules/users/users.service.js';
-import { ListUsersQueryDto } from '../src/modules/users/users.dto.js';
+import { userRepository } from '../../../../src/modules/users/users.repository.js';
+import { userService } from '../../../../src/modules/users/users.service.js';
+import { ListUsersQueryDto } from '../../../../src/modules/users/users.dto.js';
 
 // Reemplazamos el repository por funciones simuladas: el servicio se prueba sin base de datos.
-vi.mock('../src/modules/users/users.repository.js', () => ({
+vi.mock('../../../../src/modules/users/users.repository.js', () => ({
   userRepository: { findMany: vi.fn(), findById: vi.fn() },
 }));
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ListUsersQueryDto, UserIdParamsDto } from '../src/modules/users/users.dto.js';
+import { ListUsersQueryDto, UserIdParamsDto } from '../../../../src/modules/users/users.dto.js';
 
 function errorOf(fn: () => unknown): { status?: number; details?: string[] } | undefined {
   try {
