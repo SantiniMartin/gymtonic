@@ -2,7 +2,7 @@ import { Role, UserStatus } from '@prisma/client';
 import type { User } from '@prisma/client';
 import { HttpError } from '../../lib/http-error.js';
 import { PaginationDto } from '../../lib/pagination.js';
-import { isOneOf, isUuid } from '../../lib/validators.js';
+import { isEmail, isNonEmptyString, isOneOf, isUuid } from '../../lib/validators.js';
 
 // ── Entrada ──
 
@@ -54,6 +54,51 @@ export class UserIdParamsDto {
   static fromParams(params: Record<string, unknown>): UserIdParamsDto {
     if (!isUuid(params.id)) throw HttpError.validation(['id: debe ser un UUID válido']);
     return new UserIdParamsDto(params.id);
+  }
+}
+
+/** POST /api/admin/users */
+export class CreateUserDto {
+  constructor(
+    public readonly email: string,
+    public readonly password: string,
+    public readonly firstName: string,
+    public readonly lastName: string,
+    public readonly phone: string | null,
+    public readonly role: Role,
+  ) {}
+
+  static fromBody(body: any): CreateUserDto {
+    const errors: string[] = [];
+    const roles = Object.values(Role);
+
+    if (!isEmail(body?.email)) errors.push('email: debe ser un email válido');
+    if (typeof body?.password !== 'string' || body.password.length < 8) {
+      errors.push('password: debe tener al menos 8 caracteres');
+    } else if (body.password.length > 128) {
+      errors.push('password: no puede superar los 128 caracteres');
+    }
+    if (!isNonEmptyString(body?.firstName)) errors.push('firstName: es obligatorio');
+    if (!isNonEmptyString(body?.lastName)) errors.push('lastName: es obligatorio');
+
+    const hasPhone = body?.phone !== undefined && body?.phone !== null && body?.phone !== '';
+    if (hasPhone && (!isNonEmptyString(body.phone) || body.phone.trim().length > 30)) {
+      errors.push('phone: debe ser texto de hasta 30 caracteres');
+    }
+
+    const role = body?.role ?? Role.MEMBER;
+    if (!isOneOf(role, roles)) errors.push(`role: debe ser uno de ${roles.join(', ')}`);
+
+    if (errors.length > 0) throw HttpError.validation(errors);
+
+    return new CreateUserDto(
+      body.email.trim().toLowerCase(),
+      body.password,
+      body.firstName.trim(),
+      body.lastName.trim(),
+      hasPhone ? body.phone.trim() : null,
+      role as Role,
+    );
   }
 }
 

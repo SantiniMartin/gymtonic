@@ -10,3 +10,4 @@ usersRouter.use(requireAuth, requireRole('ADMIN'));
 
 usersRouter.get('/', userController.list);
 usersRouter.get('/:id', userController.getById);
+usersRouter.post('/', userController.create);

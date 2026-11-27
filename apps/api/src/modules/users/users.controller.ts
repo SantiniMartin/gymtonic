@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { ListUsersQueryDto, UserIdParamsDto } from './users.dto.js';
+import { CreateUserDto, ListUsersQueryDto, UserIdParamsDto } from './users.dto.js';
 import { userService } from './users.service.js';
 
 export class UserController {
@@ -13,6 +13,12 @@ export class UserController {
     const { id } = UserIdParamsDto.fromParams(req.params);
     const user = await userService.getById(id);
     res.json(user);
+  };
+
+  create = async (req: Request, res: Response) => {
+    const dto = CreateUserDto.fromBody(req.body);
+    const user = await userService.create(dto, req.user!.id);
+    res.status(201).json(user);
   };
 }
 
