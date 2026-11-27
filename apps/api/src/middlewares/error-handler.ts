@@ -38,6 +38,25 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     return;
   }
 
+  // Otros errores expuestos por body-parser (ej. 413 Payload Too Large, 415 Unsupported Media Type)
+  if (
+    typeof err === 'object' &&
+    err !== null &&
+    'status' in err &&
+    typeof (err as { status: unknown }).status === 'number' &&
+    'expose' in err &&
+    (err as { expose: unknown }).expose === true
+  ) {
+    const status = (err as { status: number }).status;
+    if (status >= 400 && status < 500) {
+      const code = status === 413 ? 'PAYLOAD_TOO_LARGE' : 'BAD_REQUEST';
+      const message =
+        status === 413 ? 'El cuerpo de la solicitud supera el tamaño máximo' : 'Solicitud inválida';
+      res.status(status).json({ error: { code, message } });
+      return;
+    }
+  }
+
   logger.error({ err, path: req.path }, 'Error no controlado');
   res
     .status(500)

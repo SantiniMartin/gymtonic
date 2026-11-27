@@ -96,9 +96,13 @@ model User {
   @@index([role, status])
 }
 
+/// Refresh token persistido como hash SHA-256 (nunca en claro).
+/// Cada login abre una familia; cada refresh rota el token dentro de la misma familia.
+/// Si se presenta un token ya revocado (reutilización), se revoca la familia entera.
 model RefreshToken {
   id        String    @id @default(uuid()) @db.Uuid
   userId    String    @db.Uuid
+  familyId  String    @db.Uuid
   tokenHash String    @unique
   expiresAt DateTime
   revokedAt DateTime?
@@ -107,6 +111,7 @@ model RefreshToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([familyId])
 }
 
 model MemberProfile {
