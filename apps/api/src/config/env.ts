@@ -16,6 +16,18 @@ function optional(name: string, defaultValue: string): string {
   return process.env[name] || defaultValue;
 }
 
+const MIN_SECRET_LENGTH = 32;
+
+/** Secreto obligatorio con largo mínimo (para firmar tokens). */
+function secret(name: string): string {
+  const value = required(name);
+  if (value.length < MIN_SECRET_LENGTH) {
+    console.error(`❌ ${name} debe tener al menos ${MIN_SECRET_LENGTH} caracteres`);
+    process.exit(1);
+  }
+  return value;
+}
+
 export const env = {
   NODE_ENV: optional('NODE_ENV', 'development'),
   PORT: Number(optional('PORT', '4000')),
@@ -27,8 +39,8 @@ export const env = {
   DATABASE_URL: required('DATABASE_URL'),
   REDIS_URL: optional('REDIS_URL', 'redis://localhost:6379'),
 
-  JWT_ACCESS_SECRET: required('JWT_ACCESS_SECRET'),
-  JWT_REFRESH_SECRET: required('JWT_REFRESH_SECRET'),
+  JWT_ACCESS_SECRET: secret('JWT_ACCESS_SECRET'),
+  JWT_REFRESH_SECRET: secret('JWT_REFRESH_SECRET'),
 
   SMTP_HOST: optional('SMTP_HOST', 'localhost'),
   SMTP_PORT: Number(optional('SMTP_PORT', '1025')),

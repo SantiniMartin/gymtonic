@@ -34,4 +34,7 @@ export class HttpError extends Error {
   static conflict(message = 'Conflicto con el estado actual del recurso') {
     return new HttpError(409, message, 'CONFLICT');
   }
+  static tooManyRequests(message = 'Demasiados intentos, probá de nuevo más tarde') {
+    return new HttpError(429, message, 'TOO_MANY_REQUESTS');
+  }
 }

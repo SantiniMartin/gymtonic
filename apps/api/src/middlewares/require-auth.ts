@@ -1,30 +1,38 @@
-import type { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { Role } from '@prisma/client';
-import { env } from '../config/env.js';
+import type { RequestHandler } from 'express';
+import type { Role } from '@prisma/client';
 import { HttpError } from '../lib/http-error.js';
-import './auth.types.js';
+import { verifyAccessToken } from '../lib/jwt.js';
+
+export interface AuthUser {
+  id: string;
+  role: Role;
+}
+
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Express {
+    interface Request {
+      user?: AuthUser;
+    }
+  }
+}
 
 /**
- * Valida el access token (header `Authorization: Bearer <token>`)
- * y carga `req.user` con el id y el rol. Sin token válido → 401.
+Extrae y valida el Bearer token del header Authorization.
+Si es válido, deja `{ id, role }` en `req.user`; si no, lanza 401.
  */
-export function requireAuth(req: Request, _res: Response, next: NextFunction) {
+export const requireAuth: RequestHandler = (req, _res, next) => {
   const header = req.headers.authorization;
-  if (!header?.startsWith('Bearer ')) throw HttpError.unauthorized();
-
-  let payload: string | jwt.JwtPayload;
-  try {
-    payload = jwt.verify(header.slice(7), env.JWT_ACCESS_SECRET);
-  } catch {
-    throw HttpError.unauthorized('Token inválido o vencido');
+  if (!header || !header.startsWith('Bearer ')) {
+    throw HttpError.unauthorized('Token de acceso requerido');
   }
 
-  const role = typeof payload === 'string' ? undefined : payload.role;
-  if (typeof payload === 'string' || !payload.sub || !Object.values(Role).includes(role)) {
-    throw HttpError.unauthorized('Token inválido');
+  const token = header.slice('Bearer '.length).trim();
+  if (!token) {
+    throw HttpError.unauthorized('Token de acceso requerido');
   }
 
-  req.user = { id: payload.sub, role };
+  const payload = verifyAccessToken(token);
+  req.user = { id: payload.sub, role: payload.role };
   next();
-}
+};
